@@ -40,3 +40,8 @@ jobs:
       run: |
         docker push ${{ secrets.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}
         docker push ${{ secrets.ECR_REPOSITORY_URI }}:latest
+
+    - name: Update App Runner Service
+      run: |
+        aws apprunner update-service --service-arn ${{ secrets.APP_RUNNER_SERVICE_ARN }} \
+          --source-configuration ImageRepositoryConfiguration={ImageIdentifier=${{ secrets.ECR_REPOSITORY_URI }}:latest,ImageRepositoryType=ECR}
