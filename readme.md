@@ -75,6 +75,7 @@ El archivo `appsettings.json` incluye los valores necesarios para la autenticaci
 1. **Autenticación JWT**:
 
    - Generar token: `POST /api/Auth/token`
+   - El usuario es 'admin' y la contraseña es 'password'
 
 2. **Productos**:
 
