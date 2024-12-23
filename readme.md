@@ -10,7 +10,7 @@ Este proyecto es una API para gestionar productos y órdenes, construida con **.
 2. Clonar este repositorio:
    ```bash
    git clone <URL_DEL_REPOSITORIO>
-   cd PruebaClean
+   cd CleanArchitecture
    ```
 
 ## Archivos Importantes
