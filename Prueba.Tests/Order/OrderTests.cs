@@ -7,6 +7,7 @@ using Prueba.Application.Orders.Commands.CreateOrder;
 using Prueba.Domain.PocoEntities.Order;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -21,6 +22,56 @@ namespace Prueba.Tests.Order
         {
             _mediatorMock = new Mock<IMediator>();
             _controller = new OrderController(_mediatorMock.Object, Mock.Of<ILogger<OrderController>>());
+        }
+        [Fact]
+        public async Task CreateOrder_Should_HandleConcurrentRequests_UsingSemaphoreSlim()
+        {
+            var expectedResponse = new CreateOrderResponse
+            {
+                OrderId = 1,
+                Total = 500,
+                Message = "Orden creada exitosamente."
+            };
+
+            var command = new CreateOrderRequest
+            {
+                ClientName = "Test Client",
+                OrderDetails = new List<CreateOrderDetailRequest>
+                {
+                    new CreateOrderDetailRequest { ProductId = 1, Quantity = 5 }
+                }
+            };
+
+            var semaphore = new SemaphoreSlim(1, 1);
+            var callCount = 0;
+
+            _mediatorMock.Setup(m => m.Send(It.IsAny<CreateOrderCommand>(), default))
+                .Returns(async () =>
+                {
+                    await semaphore.WaitAsync();
+                    try
+                    {
+                        callCount++;
+                        await Task.Delay(1000); 
+                        return expectedResponse;
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                });
+
+            var stopwatch = Stopwatch.StartNew();
+
+            // Realizamos dos llamadas concurrentes
+            var task1 = _controller.CreateOrder(command);
+            var task2 = _controller.CreateOrder(command);
+
+            await Task.WhenAll(task1, task2);
+
+            stopwatch.Stop();
+            Assert.True(stopwatch.ElapsedMilliseconds >= 2000, "CreateOrder is not serializing requests.");
+            Assert.Equal(2, callCount); 
         }
 
         [Fact]
