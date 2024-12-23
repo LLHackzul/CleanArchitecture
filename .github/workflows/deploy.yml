@@ -14,9 +14,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Define IMAGE_TAG
-        run: echo "IMAGE_TAG=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
-
     - name: Log in to Amazon ECR
       id: ecr-login
       run: |
@@ -25,14 +22,21 @@ jobs:
         aws configure set default.region ${{ secrets.AWS_REGION }}
         aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY_URI }}
 
+    - name: Define IMAGE_TAG
+      id: define-tag
+      run: echo "IMAGE_TAG=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Debug IMAGE_TAG
+      run: echo "IMAGE_TAG=${{ env.IMAGE_TAG }}"
+      shell: bash
+
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.ECR_REPOSITORY_URI }}:$IMAGE_TAG .
-        docker tag ${{ secrets.ECR_REPOSITORY_URI }}:$IMAGE_TAG ${{ secrets.ECR_REPOSITORY_URI }}:latest
+        docker build -t ${{ secrets.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }} .
+        docker tag ${{ secrets.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }} ${{ secrets.ECR_REPOSITORY_URI }}:latest
 
     - name: Push Docker image to ECR
       run: |
-        docker push ${{ secrets.ECR_REPOSITORY_URI }}:$IMAGE_TAG
+        docker push ${{ secrets.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}
         docker push ${{ secrets.ECR_REPOSITORY_URI }}:latest
-
-   
