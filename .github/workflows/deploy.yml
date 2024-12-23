@@ -14,6 +14,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Define IMAGE_TAG
+        run: echo "IMAGE_TAG=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+
     - name: Log in to Amazon ECR
       id: ecr-login
       run: |
@@ -24,7 +27,6 @@ jobs:
 
     - name: Build Docker image
       run: |
-        IMAGE_TAG=$(date +%Y%m%d%H%M%S)
         docker build -t ${{ secrets.ECR_REPOSITORY_URI }}:$IMAGE_TAG .
         docker tag ${{ secrets.ECR_REPOSITORY_URI }}:$IMAGE_TAG ${{ secrets.ECR_REPOSITORY_URI }}:latest
 
