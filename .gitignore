@@ -1,0 +1,43 @@
+# General
+*.DS_Store
+*.swp
+
+# Build Folders
+bin/
+obj/
+
+# User-specific Files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Visual Studio
+.vs/
+
+# ASP.NET Core
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+
+# Logs
+*.log
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# Resharper
+_ReSharper*/
+*.[rR]e[Ss]harper
+
+# Windows image file caches
+Thumbs.db
+Desktop.ini
+
+# Docker Ignore
+.env
+/.dockerignore
